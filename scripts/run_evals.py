@@ -41,12 +41,13 @@ def git(cwd: Path, *args: str) -> str:
 
 def prepare(case: dict, work: Path) -> None:
     fx = EVALS / "fixtures" / case["fixture"]
-    shutil.copytree(fx / "base", work, dirs_exist_ok=True)
+    junk = shutil.ignore_patterns("__pycache__", "*.pyc", ".pytest_cache")   # never let local test runs leak into a fixture
+    shutil.copytree(fx / "base", work, dirs_exist_ok=True, ignore=junk)
     git(work, "init", "-q", "-b", "main")
     git(work, "-c", "user.name=eval", "-c", "user.email=eval@example.invalid", "add", "-A")
     git(work, "-c", "user.name=eval", "-c", "user.email=eval@example.invalid", "commit", "-qm", "base")
     if (fx / "change").is_dir():
-        shutil.copytree(fx / "change", work, dirs_exist_ok=True)
+        shutil.copytree(fx / "change", work, dirs_exist_ok=True, ignore=junk)
         git(work, "add", "-N", ".")          # make new files visible to `git diff`
     shutil.copytree(ROOT / "skills", work / ".claude" / "skills")
 
@@ -123,7 +124,7 @@ def run_case(case: dict, model: str, budget: float) -> dict:
             fails.append(str(exc))
     return {"id": case["id"], "pass": not fails, "fails": fails, "skills": skills_used,
             "seconds": round(time.monotonic() - t0, 1), "turns": turns, "cost_usd": round(cost, 4),
-            "answer_excerpt": result_text[:600]}
+            "answer_excerpt": result_text[:600], "answer": result_text}
 
 
 def main() -> int:

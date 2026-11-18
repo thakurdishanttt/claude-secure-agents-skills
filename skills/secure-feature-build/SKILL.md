@@ -1,10 +1,10 @@
 ---
 name: secure-feature-build
-description: Build a feature end to end under security gates: size the work, plan with a threat model, implement in verified steps, review until approved, show real test output. Use whenever asked to build, implement or add a feature, endpoint, flow, integration, agent or tool in a codebase.
+description: Build a feature end to end under security gates - size the work, plan with a threat model, get approval, implement in verified steps, review until approved, show real test output. Use when the user asks to build, implement, add or create a feature, endpoint, flow, integration, agent or tool (e.g. "build a password reset flow", "add an upload endpoint"); load it before writing any code.
 compatibility: Any coding agent that reads SKILL.md, can edit files and run tests. Uses subagents for planning and review when the agent supports them (e.g. Claude Code); otherwise runs every gate itself.
 metadata:
   author: Thakur Dishant Kumar
-  version: "1.2.0"
+  version: "1.2.1"
 ---
 # Secure Feature Build
 

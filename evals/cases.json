@@ -44,7 +44,7 @@
       ],
       "must_not": [
         "\\[(Critical|High)\\]",
-        "Verdict[^\\n]*\\n+[^\\n]*BLOCK"
+        "Verdict[^\\n]*\\n+[^\\n]*\\*\\*BLOCK"
       ],
       "unchanged": true,
       "max_turns": 15
@@ -93,6 +93,52 @@
       "max_turns": 15
     },
     {
+      "id": "review-multi-file-idor",
+      "skill": "secure-code-review",
+      "fixture": "invoices-idor",
+      "prompt": "review my changes",
+      "tools": [
+        "Read",
+        "Grep",
+        "Glob",
+        "Bash(git diff:*)",
+        "Bash(git status:*)",
+        "Bash(git log:*)"
+      ],
+      "must": [
+        "IDOR|insecure direct object|broken object|authori[sz]ation|ownership",
+        "tenant",
+        "BLOCK|REQUEST CHANGES",
+        "service\\.py|repo\\.py|routes\\.py"
+      ],
+      "must_not": [],
+      "unchanged": true,
+      "max_turns": 15
+    },
+    {
+      "id": "review-safe-but-scary-no-false-alarm",
+      "skill": "secure-code-review",
+      "fixture": "safe-but-scary",
+      "prompt": "review my changes before I merge",
+      "tools": [
+        "Read",
+        "Grep",
+        "Glob",
+        "Bash(git diff:*)",
+        "Bash(git status:*)",
+        "Bash(git log:*)"
+      ],
+      "must": [
+        "APPROVE"
+      ],
+      "must_not": [
+        "\\[(Critical|High)\\]",
+        "Verdict[^\\n]*\\n+[^\\n]*\\*\\*BLOCK"
+      ],
+      "unchanged": true,
+      "max_turns": 15
+    },
+    {
       "id": "iac-review-finds-misconfigs",
       "skill": "iac-security-review",
       "fixture": "iac-vuln",
@@ -110,7 +156,7 @@
         "0\\.0\\.0\\.0/0",
         "privileged",
         "pull_request_target",
-        "wildcard|\"\\*\"|Action\\s*=\\s*\"\\*\"|\\* actions|`\\*`",
+        "wildcard|\"\\*\"|`\\*`|\\* actions|Action\\s*[:=]\\s*\"?\\*|allows? everything|full (account )?admin|admin(istrator)? IAM|all actions on all resources",
         "publicly_accessible|public(ly)? accessible",
         "(USER|root)",
         "SHA|pin"
@@ -167,7 +213,7 @@
     {
       "id": "feature-build-plans-and-waits",
       "skill": "secure-feature-build",
-      "fixture": "flask-app",
+      "fixture": "accounts-app",
       "prompt": "build a password reset flow for this app",
       "tools": [
         "Read",
@@ -198,7 +244,7 @@
         "Glob"
       ],
       "must": [
-        "(must not|should not|don't|do not|never)",
+        "(must not|should not|don't|do not|never|not to log|breaks? a MUST|^\\W*no\\b)",
         "redact|PII|secret|sensitive"
       ],
       "must_not": [],

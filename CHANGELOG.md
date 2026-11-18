@@ -5,6 +5,9 @@ All notable changes to the skills. Each skill also carries its own version in
 
 ## Unreleased
 ### Added
+- `docs/compliance.md`: how the skills support SOC 2, ISO/IEC 27001:2022, PCI DSS v4.0 and NIST SSDF evidence.
+- Two eval cases: a multi-file IDOR (missing tenant check across four files) and a safe-but-scary false-positive test. Suite: 12 cases; 36/36 runs on Sonnet, 12/12 on Opus, 12/12 on Haiku.
+- `evals/last-run-opus.json` and `last-run-haiku.json`; results now store each full answer for review.
 - `iac-security-review` 1.0.0: reviews Terraform, CloudFormation, Kubernetes, Helm, Dockerfiles, compose and GitHub Actions.
 - Organization rules: every skill reads `.security/rules.md` and enforces it by rule ID (all skills 1.2.0).
 - SARIF 2.1.0 output from `secure-code-review` and `iac-security-review` when asked; `scripts/extract_sarif.py` validates it; GitHub code-scanning recipe in `docs/ci-integration.md` (tested end to end).
@@ -12,6 +15,9 @@ All notable changes to the skills. Each skill also carries its own version in
 - `docs/enterprise.md` (rollout, pinning, air-gapped use, data handling, licensing, contact) and `docs/customization.md`.
 - Three eval cases (SARIF, org rules, IaC). Full suite: 30/30 runs passed on Sonnet.
 ### Changed
+- `secure-feature-build` 1.2.1: description says to load it before writing any code (Haiku skipped it before).
+- `feature-build-plans-and-waits` now uses a small accounts app fixture, so the build request is realistic.
+- Fixtures are copied without `__pycache__` and other build junk.
 - Removed placeholder text from docs and templates.
 - `secure-code-review` 1.1.1 and `secure-feature-build` 1.1.1: concrete examples instead of placeholders.
 

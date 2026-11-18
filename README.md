@@ -7,7 +7,7 @@
 | **Skills** | 6 |
 | **Standards** | OWASP Top 10 for LLM Applications 2025 · OWASP Top 10 for Agentic Applications 2026 · OWASP ASVS L2 |
 | **Agents** | Claude Code · OpenAI Codex · Cursor · GitHub Copilot (VS Code) · Gemini CLI · any agent that reads `SKILL.md` |
-| **Quality gate** | 10 eval cases, 30/30 runs passed on Claude Sonnet ([details](docs/quality.md)) |
+| **Quality gate** | 12 eval cases: 36/36 runs on Claude Sonnet, 12/12 on Opus, 12/12 on Haiku ([details](docs/quality.md)) |
 | **Footprint** | ~70–85 tokens per skill at session start; 900–1,550 tokens when a skill runs |
 | **Integrations** | SARIF 2.1.0 for GitHub code scanning · organization rules via `.security/rules.md` · versioned releases with SHA256SUMS |
 | **Owner** | Thakur Dishant Kumar |
@@ -34,6 +34,7 @@ Licensing and team use: [docs/enterprise.md](docs/enterprise.md).
 | Team rollout, version pinning, air-gapped use, licensing | [docs/enterprise.md](docs/enterprise.md) |
 | Enforce your company's own security rules | [docs/customization.md](docs/customization.md) |
 | Review every PR in CI and publish to GitHub code scanning (SARIF) | [docs/ci-integration.md](docs/ci-integration.md) |
+| Map the controls to SOC 2, ISO 27001, PCI DSS and NIST SSDF for auditors | [docs/compliance.md](docs/compliance.md) |
 | Verify a release | each GitHub Release has the zips and `SHA256SUMS` (`sha256sum -c SHA256SUMS`) |
 
 ## Install
@@ -53,7 +54,7 @@ Re-run the same command to update; `--list` shows what is installed, `--uninstal
 - **Progressive loading.** At session start an agent sees only each skill's one-line description. The full `SKILL.md` loads only when the skill is needed, and it reads only the standard sections the change touches (`references/`), never the whole standard.
 - **Enforced budgets.** CI fails if a description exceeds 420 characters or a `SKILL.md` exceeds ~1,600 tokens.
 - **Sized work.** `secure-feature-build` picks tier S / M / L first, so small changes don't pay for a full planning and review cycle.
-- **Measured.** A full eval run takes about 90 s with 10 cases in parallel. A single skill run takes 5–50 s, and most reviews finish in 15–35 s at $0.06–0.10 on Sonnet.
+- **Measured.** A full eval run takes about 100 s with 12 cases in parallel. A single skill run takes 5–50 s, and most reviews finish in 15–35 s at $0.06–0.10 on Sonnet.
 
 ## Accuracy
 
@@ -76,7 +77,7 @@ Reporting vulnerabilities and the full model: [SECURITY.md](SECURITY.md).
 
 ## How it stays current
 
-The security standard has one source of truth: [claude-code-secure-agents](https://github.com/thakurdishanttt/claude-code-secure-agents), which watches Claude Code and OWASP/NIST/MITRE changes and updates itself. A weekly workflow syncs it into every skill's `references/`, bumps the affected skills' versions and opens a pull request. Details: [docs/architecture.md](docs/architecture.md).
+The security standard has one source of truth: [claude-code-secure-agents](https://github.com/thakurdishanttt/claude-code-secure-agents), which watches Claude Code and OWASP/NIST/MITRE changes and updates itself. A weekly workflow syncs it into every skill's `references/`, bumps the affected skills' versions and opens a pull request for review. Details: [docs/architecture.md](docs/architecture.md).
 
 ## Repository layout
 
@@ -96,10 +97,10 @@ scripts/
   package.py                  reproducible zips + SHA256SUMS (dist/)
   sync_from_kit.py            pulls the security standard from claude-code-secure-agents
 evals/
-  cases.json                  10 eval cases
-  fixtures/                   flask-vuln, util-clean, org-rules, iac-vuln, rag-design, lodash-old, flask-app
-  last-run.json               results of the last published run
-docs/                         installation, enterprise, customization, ci-integration, architecture, quality
+  cases.json                  12 eval cases
+  fixtures/                   flask-vuln, util-clean, org-rules, invoices-idor, safe-but-scary, iac-vuln, rag-design, lodash-old, accounts-app
+  last-run*.json              results of the last published runs (Sonnet, Opus, Haiku)
+docs/                         installation, enterprise, customization, ci-integration, compliance, architecture, quality
 .github/
   workflows/                  ci.yml (validate + package), evals.yml, release.yml (tag → GitHub Release), sync-kit.yml (weekly)
   CODEOWNERS, PULL_REQUEST_TEMPLATE.md, ISSUE_TEMPLATE/

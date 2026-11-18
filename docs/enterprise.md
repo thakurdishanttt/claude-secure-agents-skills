@@ -6,6 +6,7 @@
 - **Your own rules** enforced alongside it, through `.security/rules.md` ([customization.md](customization.md)).
 - **SARIF output** for GitHub code scanning and security dashboards ([ci-integration.md](ci-integration.md)).
 - **Measured quality:** every release passes the full eval suite ([quality.md](quality.md)).
+- **Audit support:** a control mapping for SOC 2, ISO/IEC 27001:2022, PCI DSS v4.0 and NIST SSDF ([compliance.md](compliance.md)).
 
 ## Rolling out to a team
 1. **Pick a version.** Each GitHub Release (tagged by date, for example `v2026.11.18`) contains one zip per skill and `SHA256SUMS`. Verify downloads with `sha256sum -c SHA256SUMS`. The zips are reproducible, so rebuilding a tag gives identical hashes.
@@ -26,7 +27,7 @@
 - Vulnerability reporting and response targets: [SECURITY.md](../SECURITY.md).
 
 ## What is tested, and what isn't
-- **Tested in CI:** Claude Code with Claude Sonnet. The cases cover skill selection, planted-vulnerability detection, false positives, organization rules, SARIF validity and read-only behaviour ([quality.md](quality.md)).
+- **Tested in CI:** Claude Code with Claude Sonnet; Opus and Haiku are run before each release. The cases cover skill selection, planted-vulnerability detection (including a cross-file IDOR), false positives on safe-but-scary code, organization rules, SARIF validity and read-only behaviour ([quality.md](quality.md)).
 - **Supported but not yet in CI:** the other agents. They load the same `SKILL.md` files, but their skill selection is not yet covered by automated tests. Please report differences as issues.
 - **Limits:** these skills make an agent apply a security standard consistently. They don't replace penetration testing, SAST/DAST tools or a human security review for high-risk releases.
 

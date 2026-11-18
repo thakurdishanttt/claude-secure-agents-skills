@@ -1,0 +1,59 @@
+# Runs the eval suite in real Claude Code sessions. Required to be 100% green
+# before skill changes merge. Needs the ANTHROPIC_API_KEY repository secret;
+# skips with a notice if it is missing. ~$1.50 per run with --repeat 3.
+name: Evals
+
+on:
+  pull_request:
+    paths: ["skills/**", "evals/**", "scripts/run_evals.py"]
+  workflow_dispatch:
+    inputs:
+      repeat:
+        description: Runs per case
+        default: "3"
+      model:
+        description: Model alias
+        default: sonnet
+
+permissions:
+  contents: read
+
+concurrency:
+  group: evals-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  evals:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Check secret
+        id: key
+        run: |
+          if [ -z "$ANTHROPIC_API_KEY" ]; then
+            echo "::notice::ANTHROPIC_API_KEY not set; skipping evals."
+            echo "skip=true" >> "$GITHUB_OUTPUT"
+          fi
+      - uses: actions/setup-node@v4
+        if: steps.key.outputs.skip != 'true'
+        with:
+          node-version: "22"
+      - name: Install Claude Code (pinned)
+        if: steps.key.outputs.skip != 'true'
+        run: npm install -g @anthropic-ai/claude-code@2.1.327
+      - name: Run evals
+        if: steps.key.outputs.skip != 'true'
+        run: |
+          python3 scripts/run_evals.py --jobs 7 \
+            --repeat "${{ inputs.repeat || '3' }}" --model "${{ inputs.model || 'sonnet' }}" \
+            --json eval-results.json | tee -a "$GITHUB_STEP_SUMMARY"
+      - uses: actions/upload-artifact@v4
+        if: always() && steps.key.outputs.skip != 'true'
+        with:
+          name: eval-results
+          path: eval-results.json

